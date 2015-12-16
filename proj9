@@ -1,0 +1,438 @@
+// Emmett Woytovich
+//squid9.java
+
+
+String names[]=  { "Alpha", "Beta", "Gamma", "Delta", "Epsilon" };
+String bnames[]= { "Enterprise", "Optimus Prime", "Bupkis", "Lusitania" };
+int ss= names.length;
+int bs= bnames.length;
+Squid school[]=  new Squid[ss];
+Boat fleet[]= new Boat[bs];
+
+float spacing;
+
+float surface;
+float sunX=0, sunY=100;
+int score=0;
+
+//// SETUP
+void setup() {
+  size( 800, 600 );
+  spacing=  width/(ss+1);
+  reset();
+}
+
+void reset() {
+  surface=  random(  height/3, height/2 );
+  sunY=  surface/3;
+  
+  // Many squids.
+  float x=  spacing;
+  for (int i=0; i<ss; i++ ) {
+    school[i]=  new Squid( names[i], x );
+    x += spacing;
+  }
+  
+  for (int k=0; k<bs; k++ ) {
+    fleet[k]=  new Boat( bnames[k] );
+    
+  }
+
+}
+
+
+//// NEXT FRAME:  scene, action
+void draw() {
+  scene();
+
+  
+  if (mousePressed) {
+    boatReport( 50, fleet, fleet.length );
+    fishReport( surface+50, school, school.length);
+  }
+  else action();
+  show();
+  messages();
+}
+void messages() {
+  fill(0);
+  textSize( 20 );
+  text( "Final Project", width/3, 20 );
+  textSize(12);
+  text("to sort boats   x:B dx:D cargo:F", 10,10);
+  text("to sort squid   x:X y:Y dy:S legs:L", 10,25);
+  text( "Click to show all boats and squids", width/3, 40 );
+  text( "ECW:  squids5.java", 10, height-10 );
+  if (score>0) text( "SCORE:  "+score, width*3/4, 20 );
+  if (score>900) {
+    if (key == 'q') score=0;
+    text( "Maximum score.\nQUITTING NOW\nPress the 'q' key to continue", width/2, 60 );
+    if (score>10000) { exit(); }
+  }
+}
+
+//// METHODS TO MOVE & DRAW.
+void scene() {
+  background( 250,90,20 );      // Dark sky.
+  // sun
+  if (sunX > width+100) {
+    sunX=  -100;
+    sunY=  random( 100, surface+50 );
+  }
+  sunX += 1;
+  fill( 255,250,50 );
+  ellipse( sunX, sunY-150*sin( PI * sunX/width ), 40,40 );
+  // opaque water
+  fill( 20,90,240,200);
+  noStroke();
+  rect( 0,surface, width, height-surface );  
+  
+}
+
+
+void action() {
+  // Move squids & boats.
+  for (int i=0; i<ss; i++ ) {
+    school[i].move();
+  }
+  for (int k=0; k<bs; k++ ) {
+    fleet[k].move();
+  }
+}
+//// Display the squids in (sorted) order.
+void show() {
+  float x=  spacing;
+  for (int i=0; i<ss; i++ ) {
+    school[i].x=  x;
+    x += spacing;
+    school[i].show();
+  }
+  for (int k=0; k<bs; k++ ) {
+    fleet[k].show();
+  }
+}
+
+//// SUMMARIES:  List all objects in the array.
+// Display the properties of each object in the array.
+void boatReport( float top, Boat[] b, int ss ) {
+  fill(255,200,200);
+  rect( 50,top, width-100, 50 + 20*ss );
+  float x=70, y=top+20;
+  // Labels.
+  fill(150,0,0);
+  text( "BOAT",  x+20, y );
+  text( "cargo", x+70, y );
+  text( "x",     x+105, y );
+  text( "dx",    x+205, y );
+  ///////////////////////////////////////
+  fill(0);
+  for (int k=0; k<bs; k++) {
+    y += 15;    // Next line.
+    text( k, x, y );
+    text( b[k].name, x+20, y );
+    text( b[k].cargo, x+70, y );
+    text( b[k].x, x+100, y );
+    text( b[k].dx, x+200, y );
+    
+  }
+  
+} 
+
+
+void fishReport( float top, Squid[] a, int ss ) {
+  fill(255,255,200);
+  rect( 50,top, width-100, 50 + 20*ss );
+  float x=70, y=top+20;
+  // Labels.
+  fill(150,0,0);
+  text( "FISH", x+20, y );
+  text( "legs", x+70, y );
+  text( "x", x+105, y );
+  text( "y", x+205, y );
+  text( "dy", x+305, y );
+  ///////////////////////////////////
+  fill(0);
+  for (int i=0; i<ss; i++) {
+    y += 15;    // Next line.
+    text( i, x, y );
+    text( a[i].name, x+20, y );
+    text( a[i].legs, x+70, y );
+    text( a[i].x, x+100, y );
+    text( a[i].y, x+200, y );
+    text( a[i].dy, x+300, y );
+  }
+}
+    
+
+//// EVENT HANDLERS:  keys, clicks ////
+void keyPressed() {
+  if( key == 'B'){bsX(fleet) ;bsX(fleet);bsX(fleet);}
+  if( key == 'D'){bsDX(fleet);bsDX(fleet);bsDX(fleet);}
+  if( key == 'F'){bsC(fleet); bsC(fleet);bsC(fleet);}
+  
+  if( key == 'X'){ssX(school); ssX(school); ssX(school);}
+  if( key == 'Y'){ssY(school); ssY(school); ssY(school);}
+  if( key == 'S'){ssDY(school);ssDY(school);ssDY(school);}
+  if( key == 'L'){ssL(school); ssL(school); ssL(school);}
+  ////////////////////////////////////////////////
+  if (key == 'r') reset();
+  // Send a squid to the bottom!
+  if (key == '0') school[0].bottom(); 
+  if (key == '1') school[1].bottom(); 
+  if (key == '2') school[2].bottom(); 
+  if (key == '3') school[3].bottom(); 
+  //// Send highest to bottom.
+  if (key == 'h') {
+    int k=0;
+    for (int i=1; i<ss; i++ ) {
+      if (school[i].y < school[k].y) k=i;           // k is index of highert.
+    }
+    school[k].bottom();     
+  }
+  // Cheat codes:
+  //// Send all to top or bottom.
+  if (key == 'b') {
+    for (int k=0; k<ss; k++ ) {
+      school[k].bottom();     
+    }
+  }
+  if (key == 't') {
+    for (int k=0; k<ss; k++ ) {
+      school[k].y=  surface+10;
+      school[k].dy=  -0.1  ;
+    }
+  }
+}
+
+
+
+
+
+///// OBJECTS /////
+
+class Squid {
+  float x,y;        // Coordinates
+  float dx=0,dy=0;  // Speed
+  float w=40,h=40;
+  int legs=10;      // Number of legs.
+  String name="";
+  float r,g,b;      // Color.
+  int count=0;
+  //// CONSTRUCTORS ////
+  Squid( String s, float x ) {
+    this.name=  s;
+    this.x=x;
+    bottom();
+    // Purplish
+    r=  random(100, 255);
+    g=  random(0, 100);
+    b=  random(100, 250);
+  }
+  //// Start again at bottom.  (Random speed.)
+  void bottom() {
+    y=  height - h;
+    dy=  -random( 0.1, 0.9 );
+    legs=  int( random(1, 10.9) );
+  }
+  //// METHODS:  move & show ////
+  void move() {
+    x += dx;
+    y += dy;
+    if (y>height) { 
+      bottom();
+      count++;
+    }
+    else if (y<surface) { 
+      dy=  -3 * dy;        // Descend fast!
+    }
+  }
+  //// Display the creature.
+  void show() {
+    fill(r,g,b);
+    stroke(r,g,b);
+    ellipse( x,y, w,h );         // round top
+    rect( x-w/2,y, w,h/2 );      // flat bottom
+    fill(255);
+    float blink=10;
+    if ( y%100 > 80) blink=2;
+    ellipse( x,y-h/4, 10, blink );     // eye
+    // Legs
+    fill(r,g,b);                 // legs.
+    float legX=  x-w/2, foot=0;
+    foot=  dy>=0 ? 0 : (y%47 > 23) ? 5 : -5;
+    strokeWeight(3);
+    for (int i=0; i<legs; i++) {
+      line( legX, y+h/2, legX+foot, 20+y+h/2 );
+      legX += w / (legs-1);
+    }
+      strokeWeight(3);
+    fill(200,200,0);
+    text( name, x-w/2, y-10+h/2 );
+    fill(0);
+    text( legs, x+2-w/2, y+h/2 );
+    fill(255);
+    if (count>0) text( count, x, y+h/2 );
+  }
+  //// Return true if near
+  boolean hit( float xx, float yy ) {
+    return dist( xx,yy, x,y ) < h;
+  }
+}
+
+
+class Boat {
+  String name="";
+  float x=0, y=surface, dx=random(1,5);
+  int cargo=0, caught=0;
+  void move() {
+    //// Fish before move:  check each squid.
+    int caught=0;
+    for (int i=0; i<ss; i++ ) {
+      if (school[i].hit( this.x, surface )) {
+        caught += school[i].legs;
+      }
+    }
+    cargo += caught;    
+    //// Now, move the boat.
+    x += dx;
+    if (caught>0) x += 2*dx;      //  Jump after catch.
+    if (x<0) {
+      score += cargo;            // Add cargo to global score.
+      cargo=0;
+      dx = random( 1, 5 );      // Variable boat speed.
+    }
+    if (x>width)  {
+      dx = -random( 0.5, 3 );    // Slower return.
+    }
+  }
+  Boat( String s ) {
+    this.name=  s;
+  }
+  //// Draw the boat.
+  void show() {
+    // Boat.
+    fill(255,0,0);
+    noStroke();
+    rect( x, surface-20, 50, 20 );
+    if (dx>0)   triangle( x+50,surface, x+50,surface-20, x+70,surface-20 );
+    else        triangle( x,surface, x,surface-20, x-20,surface-20 );
+    rect( x+12, surface-30, 25, 10 );      // Cabin.
+    fill(0);
+    rect( x+20, surface-40, 10, 10 );      // Smokestack.
+    // Display name & cargo.
+    fill(255);
+    text( name, x+5, surface-10 );
+    fill(0);
+    if (cargo>0) text( cargo, x+20, surface );
+    // Smoke
+    fill( 50,50,50, 200 );
+    ellipse( x +20 -10*dx, surface-50, 20, 20 );
+    ellipse( x +20 -20*dx, surface-60, 15, 10 );
+    ellipse( x +20 -30*dx, surface-70, 8, 5 );
+  }    
+}
+
+
+void bsX(Boat[] f){
+  Boat temp = new Boat("");  
+    for(int i = 0; i < fleet.length; i++){
+        int t = i;
+        
+        for(int k = i; k < fleet.length;k++){
+          if(fleet[k].x < fleet[i].x){t=k;}
+        }
+        
+        temp.x=fleet[i].x;     temp.dx=fleet[i].dx;     temp.name=fleet[i].name;     temp.caught=fleet[i].caught;     temp.cargo=fleet[i].cargo;
+        fleet[i].x=fleet[t].x; fleet[i].dx=fleet[t].dx; fleet[i].name=fleet[t].name; fleet[i].caught=fleet[t].caught; fleet[i].cargo=fleet[t].cargo;
+        fleet[t].x=temp.x;     fleet[t].dx=temp.dx;     fleet[t].name=temp.name;     fleet[t].caught=temp.caught;     fleet[t].cargo=temp.cargo;
+  }
+}
+void bsDX(Boat[] f){
+  Boat temp = new Boat("");  
+    for(int i = 0; i < fleet.length; i++){
+        int t = i;
+        
+        for(int k = i; k < fleet.length;k++){
+          if(fleet[k].dx < fleet[i].dx){t=k;}
+        }
+        
+        temp.x=fleet[i].x;     temp.dx=fleet[i].dx;     temp.name=fleet[i].name;     temp.caught=fleet[i].caught;     temp.cargo=fleet[i].cargo;
+        fleet[i].x=fleet[t].x; fleet[i].dx=fleet[t].dx; fleet[i].name=fleet[t].name; fleet[i].caught=fleet[t].caught; fleet[i].cargo=fleet[t].cargo;
+        fleet[t].x=temp.x;     fleet[t].dx=temp.dx;     fleet[t].name=temp.name;     fleet[t].caught=temp.caught;     fleet[t].cargo=temp.cargo;
+  }
+}
+void bsC(Boat[] f){
+  Boat temp = new Boat("");  
+    for(int i = 0; i < fleet.length; i++){
+        int t = i;
+        
+        for(int k = i; k < fleet.length;k++){
+          if(fleet[k].cargo < fleet[i].cargo){t=k;}
+        }
+        
+        temp.x=fleet[i].x;     temp.dx=fleet[i].dx;     temp.name=fleet[i].name;     temp.caught=fleet[i].caught;     temp.cargo=fleet[i].cargo;
+        fleet[i].x=fleet[t].x; fleet[i].dx=fleet[t].dx; fleet[i].name=fleet[t].name; fleet[i].caught=fleet[t].caught; fleet[i].cargo=fleet[t].cargo;
+        fleet[t].x=temp.x;     fleet[t].dx=temp.dx;     fleet[t].name=temp.name;     fleet[t].caught=temp.caught;     fleet[t].cargo=temp.cargo;
+  }
+}
+
+
+
+/////////////////////////////////////////////////////////////
+
+void ssX(Squid[] s){
+  Squid temp = new Squid("",0);  
+    for(int i = 0; i < school.length; i++){
+        int t = i;
+        
+        for(int k = i; k < school.length;k++){
+          if(school[k].x < school[i].x){t=k;}
+        }
+        
+        temp.x=school[i].x;      temp.y=school[i].y;      temp.name=school[i].name;      temp.dy=school[i].dy;      temp.legs=school[i].legs;
+        school[i].x=school[t].x; school[i].y=school[t].y; school[i].name=school[t].name; school[i].dy=school[t].dy; school[i].legs=school[t].legs;
+        school[t].x=temp.x;      school[t].y=temp.y;      school[t].name=temp.name;      school[t].dy=temp.dy;      school[t].legs=temp.legs;
+  }
+}
+void ssY(Squid[] s){
+  Squid temp = new Squid("",0);  
+    for(int i = 0; i < school.length; i++){
+        int t = i;
+        
+        for(int k = i; k < school.length;k++){
+          if(school[k].y < school[i].y){t=k;}
+        }
+        
+        temp.x=school[i].x;      temp.y=school[i].y;      temp.name=school[i].name;      temp.dy=school[i].dy;      temp.legs=school[i].legs;
+        school[i].x=school[t].x; school[i].y=school[t].y; school[i].name=school[t].name; school[i].dy=school[t].dy; school[i].legs=school[t].legs;
+        school[t].x=temp.x;      school[t].y=temp.y;      school[t].name=temp.name;      school[t].dy=temp.dy;      school[t].legs=temp.legs;
+  }
+}
+void ssDY(Squid[] s){
+  Squid temp = new Squid("",0);  
+    for(int i = 0; i < school.length; i++){
+        int t = i;
+        
+        for(int k = i; k < school.length;k++){
+          if(school[k].dy < school[i].dy){t=k;}
+        }
+        
+        temp.x=school[i].x;      temp.y=school[i].y;      temp.name=school[i].name;      temp.dy=school[i].dy;      temp.legs=school[i].legs;
+        school[i].x=school[t].x; school[i].y=school[t].y; school[i].name=school[t].name; school[i].dy=school[t].dy; school[i].legs=school[t].legs;
+        school[t].x=temp.x;      school[t].y=temp.y;      school[t].name=temp.name;      school[t].dy=temp.dy;      school[t].legs=temp.legs;
+  }
+}
+void ssL(Squid[] s){
+  Squid temp = new Squid("",0);  
+    for(int i = 0; i < school.length; i++){
+        int t = i;
+        
+        for(int k = i; k < school.length;k++){
+          if(school[k].legs < school[i].legs){t=k;}
+        }
+        
+        temp.x=school[i].x;      temp.y=school[i].y;      temp.name=school[i].name;      temp.dy=school[i].dy;      temp.legs=school[i].legs;
+        school[i].x=school[t].x; school[i].y=school[t].y; school[i].name=school[t].name; school[i].dy=school[t].dy; school[i].legs=school[t].legs;
+        school[t].x=temp.x;      school[t].y=temp.y;      school[t].name=temp.name;      school[t].dy=temp.dy;      school[t].legs=temp.legs;
+  }
+}
