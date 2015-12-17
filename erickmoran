@@ -1,0 +1,93 @@
+//String name:ERICK MORAN
+//Project 9
+class Boat {
+  float posX, posY;
+  float movX;
+  float r = random(255);
+  float g = random(255);
+  float b = random(255);
+
+
+
+  
+  Boat(float horizon) {
+    posX = random(0, width);
+    posY = horizon;
+    movX = random(-4, 4);
+    int(r);
+    int(g);
+    int(b);
+  }
+
+ 
+  void disp(int i) {
+    fill(r, g);
+    quad(posX-20, posY-20, posX+20, posY-20, posX+10, posY, posX-10, posY);
+    quad(posX-10, posY-20, posX, posY-30, posX+10, posY-20,posX-10,posY-10);
+    fill(0);
+
+
+   
+    text(i, posX-3, posY-5);
+  }
+
+  //back and forth
+  void move() {
+    posX += movX;
+    if (posX < 0) movX = random(1.5, 4);
+    if (posX > width) movX = random(-1.5, -4);
+  }
+}
+
+
+
+int squadMany = 5;
+Boat squad[] = new Boat[squadMany];
+
+
+float horizon;
+
+
+void setup() {
+  size(450, 600);
+  rectMode(CORNERS);
+  reset();
+}
+
+void reset() {
+  horizon = height/3;
+  for (int i=0; i<squadMany; i++ ) {
+    squad[i] = new Boat(horizon);
+  }
+  frameCount = 1;
+}
+
+void draw() {
+  scene();
+  display();
+  movement();
+}
+//where all the sky and water meet
+void scene() {
+  noStroke();
+  background(36, 45, 240);//blue skys
+  fill(0, 170, 180);
+  rect(0, horizon, width, height);//sea
+}
+
+void display() {
+  stroke(1);
+  for (int i=0; i<squadMany; i++ ) {
+    squad[i].disp(i+1);
+  }
+}
+
+void movement() {
+  for (int i=0; i<squadMany; i++ ) {
+    squad[i].move();
+  }
+}
+
+void mousePressed() {
+  reset();
+}
